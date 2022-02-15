@@ -10,14 +10,17 @@
         : INamingProvider
     {
         private readonly NamingScheme _namingScheme;
+        private readonly GeneratorConfiguration _configuration;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NamingProvider"/> class.
+        /// Initializes a new instance of the <see cref="NamingProvider" /> class.
         /// </summary>
         /// <param name="namingScheme">The naming scheme.</param>
-        public NamingProvider(NamingScheme namingScheme)
+        /// <param name="configuration">The configuration.</param>
+        public NamingProvider(NamingScheme namingScheme, GeneratorConfiguration configuration)
         {
             _namingScheme = namingScheme;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -29,7 +32,7 @@
         /// <returns>Name of the property</returns>
         public virtual string PropertyNameFromAttribute(string typeModelName, string attributeName, XmlSchemaAttribute attribute)
         {
-            return typeModelName.ToTitleCase(_namingScheme) + attributeName.ToTitleCase(_namingScheme);
+            return typeModelName.ToTitleCase(_namingScheme, _configuration) + attributeName.ToTitleCase(_namingScheme, _configuration);
         }
 
         /// <summary>
@@ -41,7 +44,7 @@
         /// <returns>Name of the property</returns>
         public virtual string PropertyNameFromElement(string typeModelName, string elementName, XmlSchemaElement element)
         {
-            return typeModelName.ToTitleCase(_namingScheme) + elementName.ToTitleCase(_namingScheme);
+            return typeModelName.ToTitleCase(_namingScheme, _configuration) + elementName.ToTitleCase(_namingScheme, _configuration);
         }
 
         /// <summary>
@@ -53,7 +56,7 @@
         /// <returns>Name of the enum member</returns>
         public virtual string EnumMemberNameFromValue(string enumName, string value, XmlSchemaEnumerationFacet xmlFacet)
         {
-            return value.ToTitleCase(_namingScheme).ToNormalizedEnumName();
+            return value.ToTitleCase(_namingScheme, _configuration).ToNormalizedEnumName();
         }
 
         /// <summary>
@@ -151,7 +154,7 @@
         /// <returns>A string formatted as desired.</returns>
         protected virtual string QualifiedNameToTitleCase(XmlQualifiedName qualifiedName)
         {
-            return qualifiedName.Name.ToTitleCase(_namingScheme);
+            return qualifiedName.Name.ToTitleCase(_namingScheme, _configuration);
         }
     }
 }

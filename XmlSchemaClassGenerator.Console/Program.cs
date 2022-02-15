@@ -56,6 +56,7 @@ namespace XmlSchemaClassGenerator.Console
             var netCoreSpecificCode = false;
             var generateCommandLineArgs = true;
             string commonBaseClassName = null;
+            var invalidCharsBehavior = InvalidCharsBehavior.Replace;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -129,7 +130,15 @@ without backing field initialization for collections
                 { "gc|generatedCodeAttribute", "add version information to GeneratedCodeAttribute (default is true)", v => createGeneratedCodeAttributeVersion = v != null },
                 { "nc|netCore", "generate .NET Core specific code that might not work with .NET Framework (default is false)", v => netCoreSpecificCode = v != null },
                 { "ca|commandArgs", "generate a comment with the exact command line arguments that were used to generate the source code (default is true)", v => generateCommandLineArgs = v != null },
-                { "bcn|baseClassName=", "the base class name for all classes that will be generated", v => commonBaseClassName = v }
+                { "bcn|baseClassName=", "the base class name for all classes that will be generated", v => commonBaseClassName = v },
+                { "icb|invalidCharsBehavior=", "invalid chars behavior (default is Replace; can be: {Replace, Skip})", v =>  {
+                                            invalidCharsBehavior = v?.ToLowerInvariant() switch
+                                            {
+                                                "replace" => InvalidCharsBehavior.Replace,
+                                                "skip" => InvalidCharsBehavior.Skip,
+                                                _ => InvalidCharsBehavior.Replace
+                                            };
+                                        }}
             };
 
             var globsAndUris = options.Parse(args);
@@ -159,15 +168,6 @@ without backing field initialization for collections
                 uris.AddRange(expandedGlob);
             }
 
-            var namespaceMap = namespaces.Select(n => CodeUtilities.ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
-            {
-                var xn = key.XmlSchemaNamespace;
-                var name = string.Join(".", xn.Split('/').Where(p => p != "schema" && GeneratorConfiguration.IdentifierRegex.IsMatch(p))
-                    .Select(n => n.ToTitleCase(NamingScheme.PascalCase)));
-                if (!string.IsNullOrEmpty(namespacePrefix)) { name = namespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name)); }
-                return name;
-            });
-
             if (!string.IsNullOrEmpty(outputFolder))
             {
                 outputFolder = Path.GetFullPath(outputFolder);
@@ -175,7 +175,6 @@ without backing field initialization for collections
 
             var generator = new Generator
             {
-                NamespaceProvider = namespaceMap,
                 OutputFolder = outputFolder,
                 GenerateNullables = nullables,
                 EnableDataBinding = enableDataBinding,
@@ -206,8 +205,18 @@ without backing field initialization for collections
                 CreateGeneratedCodeAttributeVersion = createGeneratedCodeAttributeVersion,
                 NetCoreSpecificCode = netCoreSpecificCode,
                 GenerateCommandLineArgumentsComment = generateCommandLineArgs,
-                CommonBaseClassName = commonBaseClassName
+                CommonBaseClassName = commonBaseClassName,
+                InvalidCharsBehavior = invalidCharsBehavior
             };
+
+            generator.NamespaceProvider = namespaces.Select(n => CodeUtilities.ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
+            {
+                var xn = key.XmlSchemaNamespace;
+                var name = string.Join(".", xn.Split('/').Where(p => p != "schema" && GeneratorConfiguration.IdentifierRegex.IsMatch(p))
+                    .Select(n => n.ToTitleCase(NamingScheme.PascalCase, generator.Configuration)));
+                if (!string.IsNullOrEmpty(namespacePrefix)) { name = namespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name)); }
+                return name;
+            });
 
             generator.CommentLanguages.AddRange(commentLanguages);
 

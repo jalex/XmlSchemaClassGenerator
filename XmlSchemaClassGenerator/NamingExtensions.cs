@@ -98,7 +98,7 @@ namespace XmlSchemaClassGenerator
             return name;
         }
 
-        public static string ToTitleCase(this string s, NamingScheme namingScheme)
+        public static string ToTitleCase(this string s, NamingScheme namingScheme, GeneratorConfiguration configuration)
         {
             if (string.IsNullOrEmpty(s)) { return s; }
             switch (namingScheme)
@@ -107,12 +107,20 @@ namespace XmlSchemaClassGenerator
                     s = s.ToPascalCase();
                     break;
             }
-            return s.MakeValidIdentifier();
+            return s.MakeValidIdentifier(configuration);
         }
 
-        private static string MakeValidIdentifier(this string s)
+        private static string MakeValidIdentifier(this string s, GeneratorConfiguration configuration)
         {
-            var id = InvalidCharsRegex.Replace(s, m => InvalidChars[m.Value[0]]);
+            string id;
+            if (configuration.InvalidCharsBehavior == InvalidCharsBehavior.Skip)
+            {
+                id = InvalidCharsRegex.Replace(s, string.Empty);
+            }
+            else
+            {
+                id = InvalidCharsRegex.Replace(s, m => InvalidChars[m.Value[0]]);
+            }
             return Provider.CreateValidIdentifier(Regex.Replace(id, @"\W+", "_"));
         }
     }

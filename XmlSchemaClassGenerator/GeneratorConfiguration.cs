@@ -20,7 +20,7 @@ namespace XmlSchemaClassGenerator
                     var xn = key.XmlSchemaNamespace;
                     var name = string.Join(".",
                         xn.Split('/').Where(p => p != "schema" && IdentifierRegex.IsMatch(p))
-                            .Select(n => n.ToTitleCase(NamingScheme.PascalCase)));
+                            .Select(n => n.ToTitleCase(NamingScheme.PascalCase, this)));
                     if (!string.IsNullOrEmpty(NamespacePrefix))
                     {
                         name = NamespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name));
@@ -35,7 +35,7 @@ namespace XmlSchemaClassGenerator
             CollectionType = typeof(Collection<>);
             MemberVisitor = (member, model) => { };
             TypeVisitor = (type, model) => { };
-            NamingProvider = new NamingProvider(NamingScheme);
+            NamingProvider = new NamingProvider(NamingScheme, this);
             Version = VersionProvider.CreateFromAssembly();
             EnableUpaCheck = true;
             CommandLineArgumentsProvider = CommandLineArgumentsProvider.CreateFromEnvironment();
@@ -89,7 +89,7 @@ namespace XmlSchemaClassGenerator
             set
             {
                 namingScheme = value;
-                NamingProvider = new NamingProvider(namingScheme);
+                NamingProvider = new NamingProvider(namingScheme, this);
             }
         }
 
@@ -321,5 +321,10 @@ namespace XmlSchemaClassGenerator
         /// A base class name for all classes that will be generated.
         /// </summary>
         public string CommonBaseClassName { get; set; }
+
+        /// <summary>
+        /// Invalid chars behavior.
+        /// </summary>
+        public InvalidCharsBehavior InvalidCharsBehavior { get; set; }
     }
 }

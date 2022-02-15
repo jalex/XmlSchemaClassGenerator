@@ -306,6 +306,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.CommonBaseClassName = value; }
         }
 
+        public InvalidCharsBehavior InvalidCharsBehavior
+        {
+            get { return _configuration.InvalidCharsBehavior; }
+            set { _configuration.InvalidCharsBehavior = value; }
+        }
+
         static Generator()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
