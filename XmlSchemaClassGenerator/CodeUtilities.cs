@@ -380,7 +380,33 @@ namespace XmlSchemaClassGenerator
             ("System.Xml.Serialization", c => c.CompactTypeNames)
         );
 
-        public static bool IsUsingNamespace(Type t, GeneratorConfiguration conf) => UsingNamespaces.Any(n => n.Namespace == t.Namespace && n.Condition(conf));
+        internal static ISet<Type> BuildInTypes = new HashSet<Type>()
+        {
+            typeof(bool),
+            typeof(byte),
+            typeof(sbyte),
+            typeof(char),
+            typeof(decimal),
+            typeof(double),
+            typeof(float),
+            typeof(int),
+            typeof(uint),
+            typeof(nint),
+            typeof(nuint),
+            typeof(long),
+            typeof(ulong),
+            typeof(short),
+            typeof(ushort),
+            typeof(string),
+            typeof(object),
+            typeof(decimal)
+        };
+
+        public static bool IsUsingNamespace(Type t, GeneratorConfiguration conf)
+        {
+            if (BuildInTypes.Contains(t)) return false;
+            return UsingNamespaces.Any(n => n.Namespace == t.Namespace && n.Condition(conf));
+        }
 
         public static bool IsUsingNamespace(string namespaceName, GeneratorConfiguration conf) => UsingNamespaces.Any(n => n.Namespace == namespaceName && n.Condition(conf));
 
