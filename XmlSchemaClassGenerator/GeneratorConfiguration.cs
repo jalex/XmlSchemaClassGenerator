@@ -316,5 +316,10 @@ namespace XmlSchemaClassGenerator
         /// A provider to obtain the command line arguments of the tool.
         /// </summary>
         public CommandLineArgumentsProvider CommandLineArgumentsProvider { get; set; }
+
+        /// <summary>
+        /// A base class name for all classes that will be generated.
+        /// </summary>
+        public string CommonBaseClassName { get; set; }
     }
 }

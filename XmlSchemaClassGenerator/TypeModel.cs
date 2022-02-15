@@ -425,6 +425,12 @@ namespace XmlSchemaClassGenerator
 
                     Configuration.MemberVisitor(member, valuePropertyModel);
                 }
+            } else
+            {
+                if (!string.IsNullOrWhiteSpace(Configuration.CommonBaseClassName))
+                {
+                    classDeclaration.BaseTypes.Add(Configuration.CommonBaseClassName);
+                }
             }
 
             if (Configuration.EnableDataBinding)

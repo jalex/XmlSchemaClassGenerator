@@ -300,6 +300,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.CommandLineArgumentsProvider = value; }
         }
 
+        public string CommonBaseClassName
+        {
+            get { return _configuration.CommonBaseClassName; }
+            set { _configuration.CommonBaseClassName = value; }
+        }
+
         static Generator()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
